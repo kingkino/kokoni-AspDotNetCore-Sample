@@ -1,0 +1,10 @@
+E:\Develope\kokoni-aspnetcore-sample\kokoni_transfer\kokoni_transfer\bin\Debug\netcoreapp1.1\kokoni_transfer.deps.json
+E:\Develope\kokoni-aspnetcore-sample\kokoni_transfer\kokoni_transfer\bin\Debug\netcoreapp1.1\kokoni_transfer.runtimeconfig.json
+E:\Develope\kokoni-aspnetcore-sample\kokoni_transfer\kokoni_transfer\bin\Debug\netcoreapp1.1\kokoni_transfer.runtimeconfig.dev.json
+E:\Develope\kokoni-aspnetcore-sample\kokoni_transfer\kokoni_transfer\bin\Debug\netcoreapp1.1\kokoni_transfer.dll
+E:\Develope\kokoni-aspnetcore-sample\kokoni_transfer\kokoni_transfer\bin\Debug\netcoreapp1.1\kokoni_transfer.pdb
+E:\Develope\kokoni-aspnetcore-sample\kokoni_transfer\kokoni_transfer\obj\Debug\netcoreapp1.1\kokoni_transfer.csprojResolveAssemblyReference.cache
+E:\Develope\kokoni-aspnetcore-sample\kokoni_transfer\kokoni_transfer\obj\Debug\netcoreapp1.1\UserSecretsAssemblyInfo.cs
+E:\Develope\kokoni-aspnetcore-sample\kokoni_transfer\kokoni_transfer\obj\Debug\netcoreapp1.1\kokoni_transfer.AssemblyInfo.cs
+E:\Develope\kokoni-aspnetcore-sample\kokoni_transfer\kokoni_transfer\obj\Debug\netcoreapp1.1\kokoni_transfer.dll
+E:\Develope\kokoni-aspnetcore-sample\kokoni_transfer\kokoni_transfer\obj\Debug\netcoreapp1.1\kokoni_transfer.pdb
