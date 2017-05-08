@@ -86,18 +86,18 @@ namespace kokoni_transfer
             app.UseIdentity();
 
             // Microsoft
-            app.UseMicrosoftAccountAuthentication(new MicrosoftAccountOptions()
-            {
-                ClientId = Configuration["Authentication:Microsoft:ClientId"],
-                ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"]
-            });
+            //app.UseMicrosoftAccountAuthentication(new MicrosoftAccountOptions()
+            //{
+            //    ClientId = Configuration["Authentication:Microsoft:ClientId"],
+            //    ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"]
+            //});
 
             // Google 
-            app.UseGoogleAuthentication(new GoogleOptions()
-            {
-                ClientId = Configuration["Authentication:Google:ClientId"],
-                ClientSecret = Configuration["Authentication:Google:ClientSecret"]
-            });
+            //app.UseGoogleAuthentication(new GoogleOptions()
+            //{
+            //    ClientId = Configuration["Authentication:Google:ClientId"],
+            //    ClientSecret = Configuration["Authentication:Google:ClientSecret"]
+            //});
 
             // Facebook
             app.UseFacebookAuthentication(new FacebookOptions()
