@@ -9,10 +9,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.SqlServer;
 using kokoni_transfer.Data;
 using kokoni_transfer.Models;
 using kokoni_transfer.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using kokoni_transfer.Helpers;
 
 namespace kokoni_transfer
 {
@@ -46,17 +50,31 @@ namespace kokoni_transfer
 
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration["ConnectionsString:DbConnection"]));
 
-
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-
-            // services.AddMvc();
 
             services.AddMvc(options =>
             {
                 options.SslPort = 44356;
                 options.Filters.Add(new RequireHttpsAttribute());
+            });
+
+            // Adds a default in-memory implementation of IDistributedCache.
+            // services.AddDistributedMemoryCache();
+
+            // SQLServerでsessionState
+            services.AddDistributedSqlServerCache(options =>
+            {
+                options.ConnectionString = Configuration["ConnectionsString:DbConnection"];
+                options.SchemaName = "dbo";
+                options.TableName = "SQLSessions";
+            });
+
+            services.AddSession(options =>
+            {
+                options.CookieName = ".Session";
+                options.IdleTimeout = TimeSpan.FromMinutes(1);
             });
 
             // Add application services.
@@ -85,6 +103,9 @@ namespace kokoni_transfer
 
             app.UseIdentity();
 
+            app.UseSession();
+
+            HttpHelper.Configure(app.ApplicationServices.GetRequiredService<IHttpContextAccessor>());
             // Microsoft
             //app.UseMicrosoftAccountAuthentication(new MicrosoftAccountOptions()
             //{

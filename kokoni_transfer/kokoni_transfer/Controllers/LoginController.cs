@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -12,10 +9,12 @@ using Microsoft.Extensions.Options;
 using kokoni_transfer.Models;
 using kokoni_transfer.Models.AccountViewModels;
 using kokoni_transfer.Services;
-
+using Microsoft.AspNetCore.Http;
+using System;
 
 namespace kokoni_transfer.Controllers
 {
+
     public class LoginController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -45,10 +44,23 @@ namespace kokoni_transfer.Controllers
         // GET: /Login/Index
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Index(string returnUrl = null)
+        public async Task<IActionResult> Index(int? id,string returnUrl = null)
         {
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.Authentication.SignOutAsync(_externalCookieScheme);
+
+            if (id != null)
+            {
+                switch (id)
+                {
+                    case 1001:
+                        ViewData["Error"] = "セッションタイムアウトしました。";
+                        break;
+                    default:
+
+                        break;
+                }
+            }
 
             ViewData["ReturnUrl"] = returnUrl;
             return View();
@@ -177,6 +189,8 @@ namespace kokoni_transfer.Controllers
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true);
             if (result.Succeeded)
             {
+                HttpContext.Session.SetString("LoginTime", DateTime.Now.ToString());
+                HttpContext.Session.SetString("OperationTime", DateTime.Now.ToString());
                 _logger.LogInformation(5, "User logged in with {Name} provider.", info.LoginProvider);
                 return RedirectToLocal(returnUrl);
             }
@@ -201,8 +215,12 @@ namespace kokoni_transfer.Controllers
                         userresult = await _userManager.AddLoginAsync(user, info);
                         if (userresult.Succeeded)
                         {
-                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            await _signInManager.SignInAsync(user, isPersistent: true);
                             _logger.LogInformation(6, "User created an account using {Name} provider.", info.LoginProvider);
+
+                            HttpContext.Session.SetString("LoginTime", DateTime.Now.ToString());
+                            HttpContext.Session.SetString("OperationTime", DateTime.Now.ToString());
+
                             return RedirectToLocal(returnUrl);
                         }
                     }
@@ -211,6 +229,7 @@ namespace kokoni_transfer.Controllers
 
                 // ログイン画面に戻る
                 ViewData["ReturnUrl"] = returnUrl;
+                ViewData["LoginProvider"] = info.LoginProvider;
                 return RedirectToLogin(returnUrl);
                 // return View("https://localhost:44356");
 

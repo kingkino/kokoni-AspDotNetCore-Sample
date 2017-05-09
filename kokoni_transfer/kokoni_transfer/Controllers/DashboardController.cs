@@ -3,30 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using kokoni_transfer.Attributes;
+using Microsoft.AspNetCore.Http;
 
 namespace kokoni_transfer.Controllers
 {
     public class DashboardController : Controller
     {
-        public IActionResult Index()
+        [CheckSessionOut]
+        public IActionResult Index(int? id)
         {
             return View();
         }
 
+        [CheckSessionOut]
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
-
             return View();
         }
 
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
+        [CheckSessionOut]
         public IActionResult Error()
         {
             return View();
