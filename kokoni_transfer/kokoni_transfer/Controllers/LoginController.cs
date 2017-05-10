@@ -11,6 +11,8 @@ using kokoni_transfer.Models.AccountViewModels;
 using kokoni_transfer.Services;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Text;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace kokoni_transfer.Controllers
 {
@@ -44,16 +46,17 @@ namespace kokoni_transfer.Controllers
         // GET: /Login/Index
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Index(int? id,string returnUrl = null)
+        public async Task<IActionResult> Index( [FromQuery]string ec, string returnUrl = null)
         {
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.Authentication.SignOutAsync(_externalCookieScheme);
 
-            if (id != null)
+            if (ec != null)
             {
-                switch (id)
+                var code = Encoding.ASCII.GetString(Base64UrlTextEncoder.Decode(ec));
+                switch (code)
                 {
-                    case 1001:
+                    case "1001":
                         ViewData["Error"] = "セッションタイムアウトしました。";
                         break;
                     default:

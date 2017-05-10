@@ -6,11 +6,26 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <form asp-area="" asp-controller="Login" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
-        <ul class="nav navbar-nav">
-            <li>
-                <button type="submit" class="btn btn-link navbar-btn navbar-link">@UserManager.GetUserName(User)</button>
-            </li>
-        </ul>
-    </form>
+    <ul class="nav navbar-top-links navbar-right">
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-user">
+                <li>
+                    <div class="text-center">
+                        <i class="fa fa-user fa-fw"></i>@UserManager.GetUserName(User)
+                    </div>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <div class="text-center">
+                        <form asp-area="" asp-controller="Login" asp-action="Logout" method="post" id="logoutForm">
+                            <button type="submit" class="btn btn-link"><i class="fa fa-sign-out fa-fw"></i>Logout</button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </li>
+    </ul>
 }

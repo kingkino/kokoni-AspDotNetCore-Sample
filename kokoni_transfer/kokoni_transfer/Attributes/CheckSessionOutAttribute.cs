@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
+using System.Text;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace kokoni_transfer.Attributes
 {
@@ -13,7 +15,8 @@ namespace kokoni_transfer.Attributes
             byte[] value;
             if (!HttpHelper.HttpContext.Session.TryGetValue("OperationTime",out value))
             {
-                filterContext.Result = new RedirectResult("~/Login/Index/1001");
+                var query = Base64UrlTextEncoder.Encode(Encoding.ASCII.GetBytes("1001"));
+                filterContext.Result = new RedirectResult($"~/Login/Index?ec={query}");
                 return;
             }
             base.OnActionExecuting(filterContext);

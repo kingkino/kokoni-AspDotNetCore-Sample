@@ -74,7 +74,7 @@ namespace kokoni_transfer
             services.AddSession(options =>
             {
                 options.CookieName = ".Session";
-                options.IdleTimeout = TimeSpan.FromMinutes(1);
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
             });
 
             // Add application services.

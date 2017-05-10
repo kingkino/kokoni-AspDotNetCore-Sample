@@ -11,7 +11,7 @@ namespace kokoni_transfer.Controllers
     public class DashboardController : Controller
     {
         [CheckSessionOut]
-        public IActionResult Index(int? id)
+        public IActionResult Index()
         {
             return View();
         }

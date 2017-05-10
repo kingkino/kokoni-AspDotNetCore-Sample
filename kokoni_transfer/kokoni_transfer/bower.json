@@ -8,7 +8,8 @@
     "jquery-validation-unobtrusive": "3.2.6",
     "startbootstrap-sb-admin-2": "startbootstrap-sb-admin#v3.3.7+1",
     "bootstrap-social": "v4.10.1",
-    "bootstrap-social-buttons": "v1.0.0"
+    "bootstrap-social-buttons": "v1.0.0",
+    "dropzone": "v4.3.0"
   },
   "resolutions": {
     "font-awesome": "~4.6.3",
