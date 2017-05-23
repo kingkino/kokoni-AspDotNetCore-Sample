@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using kokoni_transfer.Helpers;
+using Microsoft.Extensions.Options;
 
 namespace kokoni_transfer
 {
@@ -48,11 +49,18 @@ namespace kokoni_transfer
             //services.AddDbContext<ApplicationDbContext>(options =>
             //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration["ConnectionsString:DbConnection"]));
+
+            // string constring = Configuration.GetConnectionString("DbConnection");
+
+            string constring = Configuration["ConnectionsString:DbConnection"];
+
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(constring));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            //services.AddMvc();
 
             services.AddMvc(options =>
             {
@@ -66,7 +74,8 @@ namespace kokoni_transfer
             // SQLServerでsessionState
             services.AddDistributedSqlServerCache(options =>
             {
-                options.ConnectionString = Configuration["ConnectionsString:DbConnection"];
+                //options.ConnectionString = Configuration["ConnectionsString:DbConnection"];
+                options.ConnectionString = constring;
                 options.SchemaName = "dbo";
                 options.TableName = "SQLSessions";
             });
@@ -80,6 +89,9 @@ namespace kokoni_transfer
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
+
+            var appSettings = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettings);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,15 +100,25 @@ namespace kokoni_transfer
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            string Facebook_AppId = Configuration.GetSection("AppSettings").GetValue<string>("Facebook_AppId");
+            string Facebook_AppSecret = Configuration.GetSection("AppSettings").GetValue<string>("Facebook_AppId");
+            string Twitter_ConsumerKey = Configuration.GetSection("AppSettings").GetValue<string>("Twitter_ConsumerKey");
+            string Twitter_ConsumerSecret = Configuration.GetSection("AppSettings").GetValue<string>("Twitter_ConsumerSecret");
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
+
+                Facebook_AppId = Configuration["Authentication:Facebook_AppId"];
+                Facebook_AppSecret = Configuration["Authentication:Facebook_AppSecret"];
+                Twitter_ConsumerKey = Configuration["Authentication:Twitter_ConsumerKey"];
+                Twitter_ConsumerSecret = Configuration["Authentication:Twitter_ConsumerSecret"];
             }
             else
             {
-                app.UseExceptionHandler("/Dashboard/Error");
+                app.UseExceptionHandler("/Dashboard/Error");                
             }
 
             app.UseStaticFiles();
@@ -106,6 +128,7 @@ namespace kokoni_transfer
             app.UseSession();
 
             HttpHelper.Configure(app.ApplicationServices.GetRequiredService<IHttpContextAccessor>());
+
             // Microsoft
             //app.UseMicrosoftAccountAuthentication(new MicrosoftAccountOptions()
             //{
@@ -120,18 +143,19 @@ namespace kokoni_transfer
             //    ClientSecret = Configuration["Authentication:Google:ClientSecret"]
             //});
 
+
             // Facebook
             app.UseFacebookAuthentication(new FacebookOptions()
             {
-                AppId = Configuration["Authentication:Facebook:AppId"],
-                AppSecret = Configuration["Authentication:Facebook:AppSecret"]
+                AppId = Facebook_AppId,
+                AppSecret = Facebook_AppSecret
             });
 
             // Twitter
             app.UseTwitterAuthentication(new TwitterOptions()
             {
-                ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"],
-                ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"]
+                ConsumerKey = Twitter_ConsumerKey,
+                ConsumerSecret = Twitter_ConsumerSecret
             }); 
 
             app.UseMvc(routes =>

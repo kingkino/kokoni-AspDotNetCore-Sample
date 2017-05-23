@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Text;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Configuration;
 
 namespace kokoni_transfer.Controllers
 {
@@ -25,6 +26,8 @@ namespace kokoni_transfer.Controllers
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
         private readonly string _externalCookieScheme;
+
+        public IConfigurationRoot Configuration { get; }
 
         public LoginController(
             UserManager<ApplicationUser> userManager,
@@ -65,6 +68,7 @@ namespace kokoni_transfer.Controllers
                 }
             }
 
+            // ViewData["testdata"] = Configuration.GetValue<string>("Hello");
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
