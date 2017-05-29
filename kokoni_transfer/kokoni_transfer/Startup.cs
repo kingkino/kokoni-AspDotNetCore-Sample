@@ -32,64 +32,71 @@ namespace kokoni_transfer
 
             if (env.IsDevelopment())
             {
-                // For more details on using the user secret store see https://go.microsoft.com/fwlink/?LinkID=532709
                 builder.AddUserSecrets<Startup>();
             }
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
+            CurrentEnvironment = env;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        // 設定情報の取得
+        private IConfigurationRoot Configuration { get; }
+
+        // ホスト環境の設定情報の取得
+        private IHostingEnvironment CurrentEnvironment { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            // DBの接続文字列を追加
+            string ConnectionString;
 
+            // 開発環境用設定
+            if (CurrentEnvironment.IsDevelopment())
+            {
+                ConnectionString = Configuration["ConnectionsString:DbConnection"];
+                services.AddMvc(options =>
+                {
+                    options.SslPort = 44356;
+                    options.Filters.Add(new RequireHttpsAttribute());
+                });
+            }
+            else
+            {
+                ConnectionString = Configuration.GetConnectionString("DbConnection");
+                services.AddMvc();
+            }
+            
+            // DBコンテキストの設定
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(ConnectionString));
 
-            // string constring = Configuration.GetConnectionString("DbConnection");
-
-            string constring = Configuration["ConnectionsString:DbConnection"];
-
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(constring));
-
+            // Identityの設定
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            //services.AddMvc();
-
-            services.AddMvc(options =>
-            {
-                options.SslPort = 44356;
-                options.Filters.Add(new RequireHttpsAttribute());
-            });
-
-            // Adds a default in-memory implementation of IDistributedCache.
-            // services.AddDistributedMemoryCache();
-
             // SQLServerでsessionState
             services.AddDistributedSqlServerCache(options =>
             {
-                //options.ConnectionString = Configuration["ConnectionsString:DbConnection"];
-                options.ConnectionString = constring;
+                options.ConnectionString = ConnectionString;
                 options.SchemaName = "dbo";
                 options.TableName = "SQLSessions";
             });
 
+            // Session情報の設定
             services.AddSession(options =>
             {
                 options.CookieName = ".Session";
-                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.IdleTimeout = TimeSpan.FromMinutes(1);
             });
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
 
+            // 型を指定して設定情報を取得する場合はこの方法
+            // IOptionsで設定情報を取得できる
             var appSettings = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettings);
         }
@@ -100,6 +107,8 @@ namespace kokoni_transfer
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+
+            // 設定情報を取得
             string Facebook_AppId = Configuration.GetSection("AppSettings").GetValue<string>("Facebook_AppId");
             string Facebook_AppSecret = Configuration.GetSection("AppSettings").GetValue<string>("Facebook_AppId");
             string Twitter_ConsumerKey = Configuration.GetSection("AppSettings").GetValue<string>("Twitter_ConsumerKey");
@@ -142,7 +151,6 @@ namespace kokoni_transfer
             //    ClientId = Configuration["Authentication:Google:ClientId"],
             //    ClientSecret = Configuration["Authentication:Google:ClientSecret"]
             //});
-
 
             // Facebook
             app.UseFacebookAuthentication(new FacebookOptions()

@@ -60,7 +60,7 @@ namespace kokoni_transfer.Controllers
                 switch (code)
                 {
                     case "1001":
-                        ViewData["Error"] = "セッションタイムアウトしました。";
+                        ViewData["Error"] = Message_Ja.Message001;
                         break;
                     default:
 
@@ -68,7 +68,6 @@ namespace kokoni_transfer.Controllers
                 }
             }
 
-            // ViewData["testdata"] = Configuration.GetValue<string>("Hello");
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -152,12 +151,14 @@ namespace kokoni_transfer.Controllers
         //}
 
         //
-        // POST: /Login/Logout
+        // POST: /Login/
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+            HttpContext.Session.Clear();
             _logger.LogInformation(4, "User logged out.");
             return RedirectToAction(nameof(LoginController.Index), "Login");
         }
@@ -215,7 +216,8 @@ namespace kokoni_transfer.Controllers
                 if (ModelState.IsValid)
                 {
                     //Get the information about the user from the external login provider
-                    var user = new ApplicationUser { UserName = info.Principal.Identity.Name.Replace(" ",""), Email = "" };
+                    // var user = new ApplicationUser { UserName = info.Principal.Identity.Name.Replace(" ",""), Email = "" };
+                    var user = new ApplicationUser { UserName = info.Principal.Identity.Name, Email = "" };
                     var userresult = await _userManager.CreateAsync(user);
                     if (userresult.Succeeded)
                     {

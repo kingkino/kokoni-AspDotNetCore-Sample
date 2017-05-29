@@ -2,14 +2,7 @@
     // Controller名を取得してレイアウトの適応判断
     var controller = this.ViewContext.RouteData.Values["controller"].ToString();
 
-    string layout = "";
-    if (controller == "Login")
-    {
-        layout = null;
-    }
-    else
-    {
-        layout = "_Layout";
-    }
-    Layout = layout;
+    // ログイン画面は共通レイアウトを利用しない
+    Layout = (controller.ToLower() == "login")? null:"_Layout";
+
 }
