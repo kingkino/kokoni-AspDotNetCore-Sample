@@ -57,6 +57,7 @@
                                         <p>
                                             @foreach (var provider in loginProviders)
                                             {
+                                                if (provider.DisplayName == "Google") { provider.DisplayName = "google-plus"; }
                                                 <button type="submit" class="btn btn-block btn-large btn-@provider.DisplayName.ToLower()" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account"><span class="fa fa-@provider.DisplayName.ToLower()" /> | @provider.AuthenticationScheme</button>
                                             }
                                         </p>

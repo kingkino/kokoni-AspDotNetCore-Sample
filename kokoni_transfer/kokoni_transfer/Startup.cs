@@ -55,10 +55,10 @@ namespace kokoni_transfer
             // 開発環境用設定
             if (CurrentEnvironment.IsDevelopment())
             {
-                ConnectionString = Configuration["ConnectionsString:DbConnection"];
+                ConnectionString = Configuration["ConnectionsStrings:DbConnection"];
                 services.AddMvc(options =>
                 {
-                    options.SslPort = 44356;
+                    options.SslPort = 44394;
                     options.Filters.Add(new RequireHttpsAttribute());
                 });
             }
@@ -72,7 +72,16 @@ namespace kokoni_transfer
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(ConnectionString));
 
             // Identityの設定
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+                    {
+                        options.Password.RequireDigit = true;
+                        options.Password.RequireLowercase = true;
+                        options.Password.RequireNonAlphanumeric = false;
+                        options.Password.RequireUppercase = true;
+                        options.User.AllowedUserNameCharacters = null;
+                        options.User.RequireUniqueEmail = false;
+                    }
+                )
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -107,29 +116,18 @@ namespace kokoni_transfer
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-
-            // 設定情報を取得
-            string Facebook_AppId = Configuration.GetSection("AppSettings").GetValue<string>("Facebook_AppId");
-            string Facebook_AppSecret = Configuration.GetSection("AppSettings").GetValue<string>("Facebook_AppId");
-            string Twitter_ConsumerKey = Configuration.GetSection("AppSettings").GetValue<string>("Twitter_ConsumerKey");
-            string Twitter_ConsumerSecret = Configuration.GetSection("AppSettings").GetValue<string>("Twitter_ConsumerSecret");
-            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
-
-                Facebook_AppId = Configuration["Authentication:Facebook_AppId"];
-                Facebook_AppSecret = Configuration["Authentication:Facebook_AppSecret"];
-                Twitter_ConsumerKey = Configuration["Authentication:Twitter_ConsumerKey"];
-                Twitter_ConsumerSecret = Configuration["Authentication:Twitter_ConsumerSecret"];
             }
             else
             {
                 app.UseExceptionHandler("/Dashboard/Error");                
             }
 
+            // 静的ファイルの使用
             app.UseStaticFiles();
 
             app.UseIdentity();
@@ -138,32 +136,33 @@ namespace kokoni_transfer
 
             HttpHelper.Configure(app.ApplicationServices.GetRequiredService<IHttpContextAccessor>());
 
+
             // Microsoft
             //app.UseMicrosoftAccountAuthentication(new MicrosoftAccountOptions()
             //{
-            //    ClientId = Configuration["Authentication:Microsoft:ClientId"],
-            //    ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"]
+            //    ClientId = Configuration["Authentication:Microsoft_ClientId"],
+            //    ClientSecret = Configuration["Authentication:Microsoft_ClientSecret"]
             //});
 
             // Google 
-            //app.UseGoogleAuthentication(new GoogleOptions()
-            //{
-            //    ClientId = Configuration["Authentication:Google:ClientId"],
-            //    ClientSecret = Configuration["Authentication:Google:ClientSecret"]
-            //});
+            app.UseGoogleAuthentication(new GoogleOptions()
+            {
+                ClientId = Configuration["Authentication:Google_ClientId"],
+                ClientSecret = Configuration["Authentication:Google_ClientSecret"]
+            });
 
             // Facebook
             app.UseFacebookAuthentication(new FacebookOptions()
             {
-                AppId = Facebook_AppId,
-                AppSecret = Facebook_AppSecret
+                AppId = Configuration["Authentication:Facebook_AppId"],
+                AppSecret = Configuration["Authentication:Facebook_AppSecret"]
             });
 
             // Twitter
             app.UseTwitterAuthentication(new TwitterOptions()
             {
-                ConsumerKey = Twitter_ConsumerKey,
-                ConsumerSecret = Twitter_ConsumerSecret
+                ConsumerKey = Configuration["Authentication:Twitter_ConsumerKey"],
+                ConsumerSecret = Configuration["Authentication:Twitter_ConsumerSecret"]
             }); 
 
             app.UseMvc(routes =>

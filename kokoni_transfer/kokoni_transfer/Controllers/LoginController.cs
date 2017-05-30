@@ -37,7 +37,7 @@ namespace kokoni_transfer.Controllers
             ISmsSender smsSender,
             ILoggerFactory loggerFactory)
         {
-            _userManager = userManager;
+             _userManager = userManager;
             _signInManager = signInManager;
             _externalCookieScheme = identityCookieOptions.Value.ExternalCookieAuthenticationScheme;
             _emailSender = emailSender;
@@ -240,12 +240,6 @@ namespace kokoni_transfer.Controllers
                 ViewData["ReturnUrl"] = returnUrl;
                 ViewData["LoginProvider"] = info.LoginProvider;
                 return RedirectToLogin(returnUrl);
-                // return View("https://localhost:44356");
-
-                // ViewData["ReturnUrl"] = returnUrl;
-                // ViewData["LoginProvider"] = info.LoginProvider;
-                // var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                // return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email });
             }
         }
 
